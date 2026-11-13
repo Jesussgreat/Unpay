@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unpay — Open Source Alternatives to Paid Software</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header / Hero Section -->
+    <header class="border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-unlock-keyhole text-xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Unpay <span class="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full font-medium">Open Source Hub</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Free & open-source alternatives to every paid tool on Earth</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="https://docs.google.com/spreadsheets/d/1PBmiFEJt1i6KEDPdOj4qTRH8wDctDaEfuUrXqJeknB4/edit" target="_blank" class="inline-flex items-center gap-2 text-xs font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3.5 py-2 rounded-lg transition">
+                    <i class="fa-solid fa-table"></i> Edit Google Sheet
+                </a>
+                <a href="https://github.com" target="_blank" class="inline-flex items-center gap-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-2 rounded-lg transition">
+                    <i class="fa-brands fa-github text-sm"></i> GitHub Repo
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- Search & Filters Toolbar -->
+        <div class="space-y-4 mb-8">
+            <div class="relative max-w-2xl mx-auto">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="searchInput" placeholder="Search tools, paid software replaced, or hardware specs..." 
+                    class="w-full pl-11 pr-4 py-3 bg-slate-900/80 border border-slate-800 rounded-xl text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-inner transition">
+            </div>
+
+            <!-- Category Filter Pills -->
+            <div id="categoryFilters" class="flex flex-wrap items-center justify-center gap-2 pt-2">
+                <button data-category="All" class="cat-btn px-4 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white shadow-sm transition">All Categories</button>
+                <button data-category="Media" class="cat-btn px-4 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">Media</button>
+                <button data-category="Productivity" class="cat-btn px-4 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">Productivity</button>
+                <button data-category="Development" class="cat-btn px-4 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">Development</button>
+                <button data-category="AI" class="cat-btn px-4 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">AI</button>
+                <button data-category="Utilities" class="cat-btn px-4 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">Utilities</button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent mb-4"></div>
+            <p class="text-sm text-slate-400 font-medium">Loading open-source tools from Google Sheet...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="hidden text-center py-20 bg-red-950/20 border border-red-900/30 rounded-2xl max-w-xl mx-auto p-8">
+            <i class="fa-solid fa-triangle-exclamation text-3xl text-red-400 mb-3"></i>
+            <h3 class="text-base font-semibold text-red-200 mb-1">Could not load database</h3>
+            <p class="text-xs text-red-400/80 mb-4">Make sure your Google Sheet is published / shared as "Anyone with the link can view".</p>
+            <button onclick="loadTools()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-medium rounded-lg transition">Retry Connection</button>
+        </div>
+
+        <!-- Tools Grid -->
+        <div id="toolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Cards Inserted Here -->
+        </div>
+
+        <!-- Empty Search Result State -->
+        <div id="noResults" class="hidden text-center py-20">
+            <i class="fa-solid fa-box-open text-4xl text-slate-600 mb-3"></i>
+            <h3 class="text-base font-medium text-slate-300">No matching tools found</h3>
+            <p class="text-xs text-slate-500 mt-1">Try searching for something else or check your spelling.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 py-6 mt-16 text-center text-xs text-slate-500">
+        <p>Built with <i class="fa-solid fa-heart text-red-500 mx-1"></i> for the open-source community. Powered by Google Sheets & GitHub Pages.</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const SHEET_URL = "https://opensheet.elk.sh/1PBmiFEJt1i6KEDPdOj4qTRH8wDctDaEfuUrXqJeknB4/Sheet1";
+        
+        let allTools = [];
+        let currentCategory = "All";
+        let searchQuery = "";
+
+        const loadingState = document.getElementById("loadingState");
+        const errorState = document.getElementById("errorState");
+        const toolsGrid = document.getElementById("toolsGrid");
+        const noResults = document.getElementById("noResults");
+        const searchInput = document.getElementById("searchInput");
+        const categoryButtons = document.querySelectorAll(".cat-btn");
+
+        async function loadTools() {
+            loadingState.classList.remove("hidden");
+            errorState.classList.add("hidden");
+            toolsGrid.innerHTML = "";
+
+            try {
+                const response = await fetch(SHEET_URL);
+                if (!response.ok) throw new Error("Network response was not ok");
+                allTools = await response.json();
+                loadingState.classList.add("hidden");
+                renderTools();
+            } catch (error) {
+                console.error("Error fetching sheet data:", error);
+                loadingState.classList.add("hidden");
+                errorState.classList.remove("hidden");
+            }
+        }
+
+        function renderTools() {
+            toolsGrid.innerHTML = "";
+
+            const filtered = allTools.filter(tool => {
+                const matchesCategory = currentCategory === "All" || (tool.category && tool.category.toLowerCase() === currentCategory.toLowerCase());
+                const query = searchQuery.toLowerCase();
+                const matchesSearch = !query || 
+                    (tool.name && tool.name.toLowerCase().includes(query)) ||
+                    (tool.replaces && tool.replaces.toLowerCase().includes(query)) ||
+                    (tool.about && tool.about.toLowerCase().includes(query)) ||
+                    (tool.hardware && tool.hardware.toLowerCase().includes(query));
+                
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                noResults.classList.remove("hidden");
+                return;
+            } else {
+                noResults.classList.add("hidden");
+            }
+
+            filtered.forEach(tool => {
+                const card = document.createElement("div");
+                card.className = "bg-slate-900/60 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 flex flex-col justify-between transition shadow-xl shadow-slate-950/50";
+                
+                // Tag styling helper
+                let tagColor = "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
+                if (tool.tag && tool.tag.toLowerCase().includes("freemium")) {
+                    tagColor = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                } else if (tool.tag && tool.tag.toLowerCase().includes("freeware")) {
+                    tagColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div>
+                                <h3 class="text-base font-semibold text-white tracking-tight">${tool.name || 'Unnamed Tool'}</h3>
+                                <p class="text-xs text-indigo-400/90 font-medium mt-0.5">Replaces: ${tool.replaces || 'Paid software'}</p>
+                            </div>
+                            <span class="text-[10px] font-semibold px-2.5 py-1 rounded-full border ${tagColor}">
+                                ${tool.tag || 'Open Source'}
+                            </span>
+                        </div>
+
+                        <p class="text-xs text-slate-300 leading-relaxed mb-4 line-clamp-3">
+                            ${tool.about || tool.description || 'No description provided.'}
+                        </p>
+
+                        <!-- Details Box -->
+                        <div class="space-y-2 bg-slate-950/40 border border-slate-800/60 rounded-xl p-3 text-[11px] mb-5">
+                            <div class="flex items-start gap-2 text-slate-300">
+                                <i class="fa-solid fa-microchip text-indigo-400 mt-0.5 w-4"></i>
+                                <span class="line-clamp-2"><strong class="text-slate-200">Hardware:</strong> ${tool.hardware || 'Standard PC'}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-slate-300">
+                                <i class="fa-solid fa-desktop text-violet-400 w-4"></i>
+                                <span><strong class="text-slate-200">Platforms:</strong> ${tool.platforms || 'Windows, macOS, Linux'}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-slate-300">
+                                <i class="fa-solid fa-scale-balanced text-emerald-400 w-4"></i>
+                                <span><strong class="text-slate-200">License:</strong> ${tool.license || 'GPL / MIT'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center gap-2 pt-2 border-t border-slate-800/60">
+                        ${tool.download_url ? `<a href="${tool.download_url}" target="_blank" class="flex-1 text-center py-2 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg transition shadow-sm shadow-indigo-600/30 flex items-center justify-center gap-1.5"><i class="fa-solid fa-download"></i> Download</a>` : ''}
+                        ${tool.repo_url ? `<a href="${tool.repo_url}" target="_blank" title="Source Repository" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition border border-slate-700"><i class="fa-brands fa-github text-sm"></i></a>` : ''}
+                        ${tool.website && tool.website !== tool.download_url ? `<a href="${tool.website}" target="_blank" title="Official Website" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition border border-slate-700"><i class="fa-solid fa-globe"></i></a>` : ''}
+                    </div>
+                `;
+                toolsGrid.appendChild(card);
+            });
+        }
+
+        // Search Event Listener
+        searchInput.addEventListener("input", (e) => {
+            searchQuery = e.target.value;
+            renderTools();
+        });
+
+        // Category Filter Listeners
+        categoryButtons.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                categoryButtons.forEach(b => {
+                    b.classList.remove("bg-indigo-600", "text-white");
+                    b.classList.add("bg-slate-900", "text-slate-300", "border", "border-slate-800");
+                });
+                btn.classList.remove("bg-slate-900", "text-slate-300", "border", "border-slate-800");
+                btn.classList.add("bg-indigo-600", "text-white");
+
+                currentCategory = btn.getAttribute("data-category");
+                renderTools();
+            });
+        });
+
+        // Initial Load on Page Startup
+        loadTools();
+    </script>
+</body>
+</html>
